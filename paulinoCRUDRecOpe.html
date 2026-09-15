@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student File Management System</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px 15px;
+    background: #000;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #1a1a1a;
+}
+
+.page {
+    max-width: 1200px;
+    margin: auto;
+    background: #f3f3f3;
+    padding: 30px;
+}
+
+h1 {
+    text-align: center;
+    margin: 0 0 25px;
+    font-size: 28px;
+}
+
+.panel {
+    background: #fff;
+    border-radius: 6px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    margin: 0 0 18px;
+    font-size: 20px;
+}
+
+h3 {
+    margin-top: 0;
+}
+
+h4 {
+    margin-bottom: 8px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.field label {
+    display: block;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #fff;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+button {
+    border: 0;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: .88;
+}
+
+.primary {
+    background: #4caf50;
+    color: #fff;
+}
+
+.secondary {
+    background: #e5e5e5;
+    color: #222;
+}
+
+.warning {
+    background: #f0ad4e;
+    color: #fff;
+}
+
+.danger {
+    background: #d9534f;
+    color: #fff;
+}
+
+.info {
+    background: #337ab7;
+    color: #fff;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.error {
+    color: #d9534f;
+    font-size: 12px;
+    margin-top: 5px;
+    display: none;
+}
+
+.error.show {
+    display: block;
+}
+
+.search {
+    margin-bottom: 15px;
+}
+
+.batch {
+    display: flex;
+    gap: 10px;
+    align-items: end;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.batch .field {
+    width: 220px;
+}
+
+.batch-error {
+    color: #d9534f;
+    font-size: 13px;
+    margin-bottom: 10px;
+    display: none;
+}
+
+.batch-error.show {
+    display: block;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1200px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 13px;
+    vertical-align: top;
+}
+
+th {
+    font-weight: 700;
+}
+
+.archived td {
+    color: #999;
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.active {
+    background: #e3f3e4;
+    color: #2f7d34;
+}
+
+.archived-tag {
+    background: #eee;
+    color: #777;
+}
+
+.empty {
+    text-align: center;
+    color: #777;
+    padding: 20px;
+}
+
+.log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 230px;
+    overflow: auto;
+}
+
+.log-list li {
+    padding: 7px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    z-index: 10;
+}
+
+.modal.open {
+    display: flex;
+}
+
+.modal-box {
+    background: #fff;
+    width: 700px;
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 6px;
+    padding: 25px;
+}
+
+.document-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 12px;
+}
+
+.document-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background: #fafafa;
+}
+
+.document-card img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 4px;
+    background: #eee;
+}
+
+.document-icon {
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eee;
+    border-radius: 4px;
+    font-size: 40px;
+}
+
+.document-name {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 8px 0;
+    word-break: break-word;
+}
+
+.document-actions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.document-actions button {
+    padding: 6px 8px;
+    font-size: 11px;
+}
+
+.file-input {
+    padding: 8px;
+}
+
+.file-box {
+    border: 1px dashed #bbb;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 8px;
+    background: #fafafa;
+}
+
+.small {
+    font-size: 12px;
+    color: #666;
+}
+
+.requirement-list {
+    padding-left: 20px;
+}
+
+.requirement-list li {
+    margin-bottom: 5px;
+}
+
+@media (max-width: 700px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+
+    .page {
+        padding: 15px;
+    }
+
+    .panel {
+        padding: 18px;
+    }
+
+    .batch .field {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<h1>Student File Management System</h1>
+
+<div class="panel">
+
+<h2>Add Student</h2>
+
+<div class="grid">
+
+<div class="field">
+<label>Student ID</label>
+<input id="f-id" type="text" placeholder="Enter Student ID">
+<div id="err-id" class="error"></div>
+</div>
+
+<div class="field">
+<label>Full Name</label>
+<input id="f-name" type="text" placeholder="Enter Full Name">
+<div id="err-name" class="error"></div>
+</div>
+
+<div class="field">
+<label>Reference Code</label>
+<input id="f-ref" type="text" placeholder="Enter Reference Code">
+<div id="err-ref" class="error"></div>
+</div>
+
+<div class="field">
+<label>School Year</label>
+<input id="f-year" type="text" placeholder="Example: 2026-2027">
+<div id="err-year" class="error"></div>
+</div>
+
+<div class="field">
+<label>Class</label>
+<input id="f-class" type="text" placeholder="Example: Grade 8-B">
+</div>
+
+<div class="field">
+<label>Enrollment Status</label>
+<select id="f-status">
+<option value="">Select Status</option>
+<option>Enrolled</option>
+<option>Pending</option>
+<option>Dropped</option>
+</select>
+<div id="err-status" class="error"></div>
+</div>
+
+<div class="field">
+<label>File Category</label>
+<input id="f-category" type="text" placeholder="Example: Academic">
+</div>
+
+<div class="field">
+<label>Requirements</label>
+<input id="f-requirements" type="text" placeholder="Example: Good Moral, Medical Certificate">
+</div>
+
+<div class="field full">
+<label>Requirement Files</label>
+<div class="file-box">
+<input id="f-requirement-files" class="file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx">
+<p class="small">Upload photos, PDF files, or documents for student requirements.</p>
+</div>
+</div>
+
+<div class="field full">
+<label>Digital Documents</label>
+<div class="file-box">
+<input id="f-document-files" class="file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx">
+<p class="small">Upload student documents such as birth certificates, report cards, IDs, and forms.</p>
+</div>
+</div>
+
+</div>
+
+<div class="actions">
+<button class="primary" onclick="addStudent()">Add Student</button>
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Global Smart Search</h2>
+
+<input
+class="search"
+id="search-box"
+type="text"
+placeholder="Search Student ID, Full Name, Reference Code, or Class"
+oninput="renderTable()"
+>
+
+</div>
+
+<div class="panel">
+
+<h2>Student Records</h2>
+
+<div class="batch">
+
+<div class="field">
+<label>Batch Action</label>
+
+<select id="batch-action">
+<option value="">Choose action</option>
+<option value="Promote">Promote</option>
+<option value="Move">Move to class</option>
+<option value="Update">Update status</option>
+<option value="AppendRequirement">Append requirement</option>
+<option value="AppendDocument">Append document</option>
+<option value="Archive">Archive selected</option>
+</select>
+
+</div>
+
+<div class="field">
+<label>Value</label>
+<input id="batch-value" type="text" placeholder="Example: Grade 9-A">
+</div>
+
+<button class="secondary" onclick="runBatch()">Apply to Selected</button>
+
+</div>
+
+<div id="batch-error" class="batch-error"></div>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th><input type="checkbox" id="select-all" onclick="toggleAll(this)"></th>
+<th>Student ID</th>
+<th>Full Name</th>
+<th>Reference Code</th>
+<th>School Year</th>
+<th>Class</th>
+<th>Status</th>
+<th>Record</th>
+<th>Files</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="table-body"></tbody>
+
+</table>
+
+</div>
+
+<div id="empty-msg" class="empty" style="display:none">
+No student records match your search.
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Activity Log</h2>
+
+<ul id="log-list" class="log-list"></ul>
+
+</div>
+
+</div>
+
+<div id="edit-modal" class="modal">
+
+<div class="modal-box">
+
+<h3>Edit Student Record</h3>
+
+<div class="grid">
+
+<div class="field">
+<label>Student ID</label>
+<input id="edit-id" type="text">
+</div>
+
+<div class="field">
+<label>Full Name</label>
+<input id="edit-name" type="text">
+<div id="edit-error" class="error"></div>
+</div>
+
+<div class="field">
+<label>Reference Code</label>
+<input id="edit-ref" type="text">
+</div>
+
+<div class="field">
+<label>School Year</label>
+<input id="edit-year" type="text">
+</div>
+
+<div class="field">
+<label>Class</label>
+<input id="edit-class" type="text">
+</div>
+
+<div class="field">
+<label>Enrollment Status</label>
+<select id="edit-status">
+<option>Enrolled</option>
+<option>Pending</option>
+<option>Dropped</option>
+</select>
+</div>
+
+<div class="field">
+<label>File Category</label>
+<input id="edit-category" type="text">
+</div>
+
+<div class="field">
+<label>Requirements</label>
+<input id="edit-requirements" type="text">
+</div>
+
+<div class="field full">
+<label>Student History</label>
+<textarea id="edit-history"></textarea>
+</div>
+
+<div class="field full">
+<label>Add Requirement Files</label>
+<input id="edit-requirement-files" class="file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx">
+</div>
+
+<div class="field full">
+<label>Add Digital Documents</label>
+<input id="edit-document-files" class="file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx">
+</div>
+
+</div>
+
+<div class="actions">
+<button class="secondary" onclick="closeEdit()">Cancel</button>
+<button class="primary" onclick="saveEdit()">Save Changes</button>
+</div>
+
+</div>
+
+</div>
+
+<div id="files-modal" class="modal">
+
+<div class="modal-box">
+
+<h3 id="files-title">Student Files</h3>
+
+<div id="files-content"></div>
+
+<div class="actions">
+<button class="secondary" onclick="closeFiles()">Close</button>
+</div>
+
+</div>
+
+</div>
+
+<div id="confirm-modal" class="modal">
+
+<div class="modal-box" style="max-width:430px">
+
+<h3>Administrator Confirmation</h3>
+
+<p id="confirm-text"></p>
+
+<div class="actions" style="justify-content:flex-end">
+
+<button class="secondary" onclick="closeConfirm()">Cancel</button>
+
+<button class="danger" id="confirm-button">
+Confirm
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let students = JSON.parse(localStorage.getItem("students") || "[]");
+let logs = JSON.parse(localStorage.getItem("logs") || "[]");
+let nextInternalId = Number(localStorage.getItem("nextInternalId") || 1);
+
+let editingId = null;
+let pendingDeleteId = null;
+
+function saveData() {
+
+    try {
+
+        localStorage.setItem("students", JSON.stringify(students));
+        localStorage.setItem("logs", JSON.stringify(logs));
+        localStorage.setItem("nextInternalId", String(nextInternalId));
+
+    } catch (error) {
+
+        alert("Storage limit reached. Remove some files or use smaller files.");
+
+    }
+
+}
+
+function log(action, id) {
+
+    logs.unshift({
+        action: action,
+        id: id,
+        time: new Date().toLocaleString()
+    });
+
+    logs = logs.slice(0, 100);
+
+    saveData();
+
+    renderLog();
+
+}
+
+function escapeHtml(value) {
+
+    return String(value || "").replace(
+        /[&<>"']/g,
+        function(c) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[c];
+        }
+    );
+
+}
+
+function validName(name) {
+
+    return /^[A-Za-z][A-Za-z .'-]{1,59}$/.test(name.trim());
+
+}
+
+function clearErrors() {
+
+    ["id", "name", "ref", "year", "status"].forEach(function(key) {
+
+        const errorElement = document.getElementById("err-" + key);
+
+        errorElement.textContent = "";
+        errorElement.classList.remove("show");
+
+    });
+
+}
+
+function showError(key, message) {
+
+    const element = document.getElementById("err-" + key);
+
+    element.textContent = message;
+    element.classList.add("show");
+
+}
+
+function readFiles(fileList) {
+
+    const files = Array.from(fileList || []);
+
+    return Promise.all(
+        files.map(function(file) {
+
+            return new Promise(function(resolve, reject) {
+
+                const reader = new FileReader();
+
+                reader.onload = function() {
+
+                    resolve({
+                        name: file.name,
+                        type: file.type || "application/octet-stream",
+                        size: file.size,
+                        data: reader.result
+                    });
+
+                };
+
+                reader.onerror = reject;
+
+                reader.readAsDataURL(file);
+
+            });
+
+        })
+    );
+
+}
+
+async function addStudent() {
+
+    clearErrors();
+
+    const id = document.getElementById("f-id").value.trim();
+    const name = document.getElementById("f-name").value.trim();
+    const ref = document.getElementById("f-ref").value.trim();
+    const year = document.getElementById("f-year").value.trim();
+    const className = document.getElementById("f-class").value.trim();
+    const status = document.getElementById("f-status").value;
+    const category = document.getElementById("f-category").value.trim();
+    const requirementsText = document.getElementById("f-requirements").value.trim();
+
+    let invalid = false;
+
+    if (!id) {
+
+        showError("id", "Student ID is required.");
+        invalid = true;
+
+    } else if (!/^[A-Za-z0-9-]{3,20}$/.test(id)) {
+
+        showError("id", "Student ID must be 3 to 20 characters.");
+        invalid = true;
+
+    } else if (
+        students.some(function(s) {
+            return s.studentId.toLowerCase() === id.toLowerCase();
+        })
+    ) {
+
+        showError("id", "This Student ID is already used.");
+        invalid = true;
+
+    }
+
+    if (!name) {
+
+        showError("name", "Full Name is required.");
+        invalid = true;
+
+    } else if (!validName(name)) {
+
+        showError("name", "Enter a valid full name.");
+        invalid = true;
+
+    } else if (
+        students.some(function(s) {
+            return s.name.toLowerCase() === name.toLowerCase();
+        })
+    ) {
+
+        showError("name", "This name is already used.");
+        invalid = true;
+
+    }
+
+    if (
+        ref &&
+        students.some(function(s) {
+            return s.refCode.toLowerCase() === ref.toLowerCase();
+        })
+    ) {
+
+        showError("ref", "This Reference Code is already used.");
+        invalid = true;
+
+    }
+
+    if (year && !/^\d{4}-\d{4}$/.test(year)) {
+
+        showError("year", "Use the format 2026-2027.");
+        invalid = true;
+
+    }
+
+    if (!status) {
+
+        showError("status", "Select an enrollment status.");
+        invalid = true;
+
+    }
+
+    if (invalid) {
+        return;
+    }
+
+    try {
+
+        const requirementFiles = await readFiles(
+            document.getElementById("f-requirement-files").files
+        );
+
+        const documentFiles = await readFiles(
+            document.getElementById("f-document-files").files
+        );
+
+        const student = {
+
+            internalId: nextInternalId++,
+
+            studentId: id,
+
+            name: name,
+
+            refCode: ref,
+
+            year: year,
+
+            className: className,
+
+            status: status,
+
+            category: category,
+
+            requirements: requirementsText
+                ? requirementsText.split(",").map(function(x) {
+                    return x.trim();
+                }).filter(Boolean)
+                : [],
+
+            requirementFiles: requirementFiles,
+
+            documents: documentFiles,
+
+            history: ["Record created"],
+
+            recordStatus: "Active"
+
+        };
+
+        students.push(student);
+
+        saveData();
+
+        log("Created record", id);
+
+        [
+            "f-id",
+            "f-name",
+            "f-ref",
+            "f-year",
+            "f-class",
+            "f-category",
+            "f-requirements"
+        ].forEach(function(field) {
+            document.getElementById(field).value = "";
+        });
+
+        document.getElementById("f-status").value = "";
+        document.getElementById("f-requirement-files").value = "";
+        document.getElementById("f-document-files").value = "";
+
+        renderTable();
+
+        alert("Student record added successfully.");
+
+    } catch (error) {
+
+        alert("There was a problem reading the uploaded files.");
+
+    }
+
+}
+
+function getFiltered() {
+
+    const query = document
+        .getElementById("search-box")
+        .value
+        .trim()
+        .toLowerCase();
+
+    if (!query) {
+        return students;
+    }
+
+    return students.filter(function(s) {
+
+        return (
+            s.studentId.toLowerCase().includes(query) ||
+            s.name.toLowerCase().includes(query) ||
+            s.refCode.toLowerCase().includes(query) ||
+            s.className.toLowerCase().includes(query)
+        );
+
+    });
+
+}
+
+function renderTable() {
+
+    const body = document.getElementById("table-body");
+
+    const list = getFiltered();
+
+    body.innerHTML = "";
+
+    document.getElementById("empty-msg").style.display =
+        list.length ? "none" : "block";
+
+    list.forEach(function(s) {
+
+        const row = document.createElement("tr");
+
+        if (s.recordStatus === "Archived") {
+            row.classList.add("archived");
+        }
+
+        const requirementCount = s.requirementFiles.length;
+        const documentCount = s.documents.length;
+
+        row.innerHTML = `
+
+            <td>
+                <input
+                    type="checkbox"
+                    class="row-check"
+                    data-id="${s.internalId}"
+                >
+            </td>
+
+            <td>${escapeHtml(s.studentId)}</td>
+
+            <td>${escapeHtml(s.name)}</td>
+
+            <td>${escapeHtml(s.refCode)}</td>
+
+            <td>${escapeHtml(s.year)}</td>
+
+            <td>${escapeHtml(s.className)}</td>
+
+            <td>${escapeHtml(s.status)}</td>
+
+            <td>
+                <span class="tag ${
+                    s.recordStatus === "Active"
+                    ? "active"
+                    : "archived-tag"
+                }">
+                    ${s.recordStatus}
+                </span>
+            </td>
+
+            <td>
+
+                <button
+                    class="info"
+                    onclick="viewFiles(${s.internalId})"
+                >
+                    ${requirementCount + documentCount} Files
+                </button>
+
+            </td>
+
+            <td>
+
+                ${
+                    s.recordStatus === "Active"
+
+                    ?
+
+                    `
+                    <button
+                        class="secondary"
+                        onclick="openEdit(${s.internalId})"
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        class="warning"
+                        onclick="archiveStudent(${s.internalId})"
+                    >
+                        Archive
+                    </button>
+
+                    <button
+                        class="danger"
+                        onclick="confirmDelete(${s.internalId})"
+                    >
+                        Delete
+                    </button>
+                    `
+
+                    :
+
+                    `
+                    <button
+                        class="secondary"
+                        onclick="restoreStudent(${s.internalId})"
+                    >
+                        Restore
+                    </button>
+
+                    <button
+                        class="danger"
+                        onclick="confirmDelete(${s.internalId})"
+                    >
+                        Delete Permanently
+                    </button>
+                    `
+                }
+
+            </td>
+
+        `;
+
+        body.appendChild(row);
+
+    });
+
+}
+
+function toggleAll(checkbox) {
+
+    document
+        .querySelectorAll(".row-check")
+        .forEach(function(check) {
+            check.checked = checkbox.checked;
+        });
+
+}
+
+function findStudent(id) {
+
+    return students.find(function(s) {
+        return s.internalId === id;
+    });
+
+}
+
+function openEdit(id) {
+
+    const student = findStudent(id);
+
+    if (!student) {
+        return;
+    }
+
+    editingId = id;
+
+    document.getElementById("edit-id").value =
+        student.studentId;
+
+    document.getElementById("edit-name").value =
+        student.name;
+
+    document.getElementById("edit-ref").value =
+        student.refCode;
+
+    document.getElementById("edit-year").value =
+        student.year;
+
+    document.getElementById("edit-class").value =
+        student.className;
+
+    document.getElementById("edit-status").value =
+        student.status;
+
+    document.getElementById("edit-category").value =
+        student.category;
+
+    document.getElementById("edit-requirements").value =
+        student.requirements.join(", ");
+
+    document.getElementById("edit-history").value =
+        student.history.join(", ");
+
+    document.getElementById("edit-requirement-files").value = "";
+
+    document.getElementById("edit-document-files").value = "";
+
+    document.getElementById("edit-error").classList.remove("show");
+
+    document.getElementById("edit-modal").classList.add("open");
+
+}
+
+function closeEdit() {
+
+    document
+        .getElementById("edit-modal")
+        .classList.remove("open");
+
+    editingId = null;
+
+}
+
+async function saveEdit() {
+
+    const student = findStudent(editingId);
+
+    if (!student) {
+        return;
+    }
+
+    const newId =
+        document.getElementById("edit-id").value.trim();
+
+    const newName =
+        document.getElementById("edit-name").value.trim();
+
+    const newRef =
+        document.getElementById("edit-ref").value.trim();
+
+    const newYear =
+        document.getElementById("edit-year").value.trim();
+
+    const errorElement =
+        document.getElementById("edit-error");
+
+    errorElement.classList.remove("show");
+
+    if (
+        !newId ||
+        !/^[A-Za-z0-9-]{3,20}$/.test(newId)
+    ) {
+
+        errorElement.textContent =
+            "Enter a valid Student ID.";
+
+        errorElement.classList.add("show");
+
+        return;
+
+    }
+
+    if (!newName || !validName(newName)) {
+
+        errorElement.textContent =
+            "Enter a valid full name.";
+
+        errorElement.classList.add("show");
+
+        return;
+
+    }
+
+    if (
+        students.some(function(s) {
+
+            return (
+                s.internalId !== student.internalId &&
+                s.studentId.toLowerCase() === newId.toLowerCase()
+            );
+
+        })
+    ) {
+
+        errorElement.textContent =
+            "This Student ID is already used.";
+
+        errorElement.classList.add("show");
+
+        return;
+
+    }
+
+    if (
+        students.some(function(s) {
+
+            return (
+                s.internalId !== student.internalId &&
+                s.name.toLowerCase() === newName.toLowerCase()
+            );
+
+        })
+    ) {
+
+        errorElement.textContent =
+            "This name is already used.";
+
+        errorElement.classList.add("show");
+
+        return;
+
+    }
+
+    if (
+        newRef &&
+        students.some(function(s) {
+
+            return (
+                s.internalId !== student.internalId &&
+                s.refCode.toLowerCase() === newRef.toLowerCase()
+            );
+
+        })
+    ) {
+
+        errorElement.textContent =
+            "This Reference Code is already used.";
+
+        errorElement.classList.add("show");
+
+        return;
+
+    }
+
+    if (
+        newYear &&
+        !/^\d{4}-\d{4}$/.test(newYear)
+    ) {
+
+        errorElement.textContent =
+            "Use the format 2026-2027.";
+
+        errorElement.classList.add("show");
+
+        return;
+
+    }
+
+    try {
+
+        const newRequirementFiles = await readFiles(
+            document.getElementById("edit-requirement-files").files
+        );
+
+        const newDocumentFiles = await readFiles(
+            document.getElementById("edit-document-files").files
+        );
+
+        student.studentId = newId;
+
+        student.name = newName;
+
+        student.refCode = newRef;
+
+        student.year = newYear;
+
+        student.className =
+            document.getElementById("edit-class").value.trim();
+
+        student.status =
+            document.getElementById("edit-status").value;
+
+        student.category =
+            document.getElementById("edit-category").value.trim();
+
+        student.requirements =
+            document.getElementById("edit-requirements")
+            .value
+            .split(",")
+            .map(function(x) {
+                return x.trim();
+            })
+            .filter(Boolean);
+
+        const historyText =
+            document.getElementById("edit-history")
+            .value
+            .trim();
+
+        student.history =
+            historyText
+            ? historyText.split(",").map(function(x) {
+                return x.trim();
+            }).filter(Boolean)
+            : [];
+
+        student.history.push("Record updated");
+
+        student.requirementFiles =
+            student.requirementFiles.concat(newRequirementFiles);
+
+        student.documents =
+            student.documents.concat(newDocumentFiles);
+
+        saveData();
+
+        log("Edited record", student.studentId);
+
+        closeEdit();
+
+        renderTable();
+
+        alert("Student record updated successfully.");
+
+    } catch (error) {
+
+        alert("There was a problem reading the uploaded files.");
+
+    }
+
+}
+
+function archiveStudent(id) {
+
+    const student = findStudent(id);
+
+    if (!student) {
+        return;
+    }
+
+    student.recordStatus = "Archived";
+
+    student.history.push("Record archived");
+
+    saveData();
+
+    log("Archived record", student.studentId);
+
+    renderTable();
+
+}
+
+function restoreStudent(id) {
+
+    const student = findStudent(id);
+
+    if (!student) {
+        return;
+    }
+
+    student.recordStatus = "Active";
+
+    student.history.push("Record restored");
+
+    saveData();
+
+    log("Restored record", student.studentId);
+
+    renderTable();
+
+}
+
+function confirmDelete(id) {
+
+    const student = findStudent(id);
+
+    if (!student) {
+        return;
+    }
+
+    pendingDeleteId = id;
+
+    document.getElementById("confirm-text").textContent =
+        `Permanently delete ${student.name}'s record? This action cannot be undone.`;
+
+    document.getElementById("confirm-modal").classList.add("open");
+
+    document.getElementById("confirm-button").onclick =
+        executeDelete;
+
+}
+
+function executeDelete() {
+
+    const student = findStudent(pendingDeleteId);
+
+    if (!student) {
+        return;
+    }
+
+    const role = prompt(
+        "Enter administrator role to continue:"
+    );
+
+    if (!role || role.toLowerCase() !== "admin") {
+
+        alert(
+            "Only an administrator can permanently delete records."
+        );
+
+        return;
+
+    }
+
+    students = students.filter(function(s) {
+
+        return s.internalId !== pendingDeleteId;
+
+    });
+
+    log(
+        "Permanently deleted record",
+        student.studentId
+    );
+
+    closeConfirm();
+
+    renderTable();
+
+}
+
+function closeConfirm() {
+
+    document
+        .getElementById("confirm-modal")
+        .classList.remove("open");
+
+    pendingDeleteId = null;
+
+}
+
+function viewFiles(id) {
+
+    const student = findStudent(id);
+
+    if (!student) {
+        return;
+    }
+
+    document.getElementById("files-title").textContent =
+        `Student Files - ${student.name}`;
+
+    let html = `
+
+        <p>
+            <strong>Student ID:</strong>
+            ${escapeHtml(student.studentId)}
+        </p>
+
+        <p>
+            <strong>Class:</strong>
+            ${escapeHtml(student.className)}
+        </p>
+
+        <p>
+            <strong>Category:</strong>
+            ${escapeHtml(student.category)}
+        </p>
+
+        <h4>Requirements</h4>
+
+    `;
+
+    if (student.requirements.length) {
+
+        html += `<ul class="requirement-list">`;
+
+        student.requirements.forEach(function(requirement) {
+
+            html += `
+                <li>
+                    ${escapeHtml(requirement)}
+                </li>
+            `;
+
+        });
+
+        html += `</ul>`;
+
+    } else {
+
+        html += `
+            <p class="small">
+                No requirements recorded.
+            </p>
+        `;
+
+    }
+
+    html += `
+        <h4>Requirement Files</h4>
+        <div class="document-list">
+    `;
+
+    if (student.requirementFiles.length) {
+
+        student.requirementFiles.forEach(function(file, index) {
+
+            html += createFileCard(
+                file,
+                "requirement",
+                index,
+                student.internalId
+            );
+
+        });
+
+    } else {
+
+        html += `
+            <p class="small">
+                No requirement files uploaded.
+            </p>
+        `;
+
+    }
+
+    html += `
+        </div>
+
+        <h4>Digital Documents</h4>
+
+        <div class="document-list">
+    `;
+
+    if (student.documents.length) {
+
+        student.documents.forEach(function(file, index) {
+
+            html += createFileCard(
+                file,
+                "document",
+                index,
+                student.internalId
+            );
+
+        });
+
+    } else {
+
+        html += `
+            <p class="small">
+                No digital documents uploaded.
+            </p>
+        `;
+
+    }
+
+    html += `
+        </div>
+
+        <h4>Student History</h4>
+    `;
+
+    if (student.history.length) {
+
+        html += `<ul class="requirement-list">`;
+
+        student.history.forEach(function(item) {
+
+            html += `
+                <li>
+                    ${escapeHtml(item)}
+                </li>
+            `;
+
+        });
+
+        html += `</ul>`;
+
+    }
+
+    document.getElementById("files-content").innerHTML =
+        html;
+
+    document.getElementById("files-modal").classList.add("open");
+
+}
+
+function createFileCard(file, category, index, studentId) {
+
+    const image =
+        file.type.startsWith("image/");
+
+    return `
+
+        <div class="document-card">
+
+            ${
+                image
+
+                ?
+
+                `
+                <img
+                    src="${file.data}"
+                    alt="${escapeHtml(file.name)}"
+                >
+                `
+
+                :
+
+                `
+                <div class="document-icon">
+                    📄
+                </div>
+                `
+            }
+
+            <div class="document-name">
+                ${escapeHtml(file.name)}
+            </div>
+
+            <div class="document-actions">
+
+                <button
+                    class="info"
+                    onclick="openFile(${studentId}, '${category}', ${index})"
+                >
+                    View
+                </button>
+
+                <button
+                    class="danger"
+                    onclick="removeFile(${studentId}, '${category}', ${index})"
+                >
+                    Remove
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+function openFile(studentId, category, index) {
+
+    const student = findStudent(studentId);
+
+    if (!student) {
+        return;
+    }
+
+    const file =
+        category === "requirement"
+        ? student.requirementFiles[index]
+        : student.documents[index];
+
+    if (!file) {
+        return;
+    }
+
+    const newWindow = window.open();
+
+    if (!newWindow) {
+
+        alert(
+            "Please allow pop-ups to view the file."
+        );
+
+        return;
+
+    }
+
+    newWindow.document.write(`
+        <html>
+        <head>
+        <title>${escapeHtml(file.name)}</title>
+        </head>
+        <body style="margin:0;padding:20px;text-align:center;font-family:Arial;background:#eee">
+
+        <h3>${escapeHtml(file.name)}</h3>
+
+        ${
+            file.type.startsWith("image/")
+
+            ?
+
+            `<img
+                src="${file.data}"
+                style="max-width:95%;max-height:80vh"
+            >`
+
+            :
+
+            `<iframe
+                src="${file.data}"
+                style="width:95%;height:80vh;border:0"
+            ></iframe>`
+        }
+
+        </body>
+        </html>
+    `);
+
+}
+
+function removeFile(studentId, category, index) {
+
+    const student = findStudent(studentId);
+
+    if (!student) {
+        return;
+    }
+
+    const list =
+        category === "requirement"
+        ? student.requirementFiles
+        : student.documents;
+
+    const file = list[index];
+
+    if (!file) {
+        return;
+    }
+
+    if (
+        !confirm(
+            `Remove ${file.name} from this student record?`
+        )
+    ) {
+        return;
+    }
+
+    list.splice(index, 1);
+
+    student.history.push(
+        `Removed file: ${file.name}`
+    );
+
+    saveData();
+
+    log(
+        "Removed file",
+        student.studentId
+    );
+
+    viewFiles(studentId);
+
+}
+
+function closeFiles() {
+
+    document
+        .getElementById("files-modal")
+        .classList.remove("open");
+
+}
+
+function runBatch() {
+
+    const action =
+        document.getElementById("batch-action").value;
+
+    const value =
+        document.getElementById("batch-value")
+        .value
+        .trim();
+
+    const error =
+        document.getElementById("batch-error");
+
+    const checked =
+        Array.from(
+            document.querySelectorAll(".row-check:checked")
+        ).map(function(element) {
+            return Number(element.dataset.id);
+        });
+
+    error.classList.remove("show");
+    error.textContent = "";
+
+    if (!action) {
+
+        error.textContent =
+            "Choose a batch action.";
+
+        error.classList.add("show");
+
+        return;
+
+    }
+
+    if (!checked.length) {
+
+        error.textContent =
+            "Select at least one record.";
+
+        error.classList.add("show");
+
+        return;
+
+    }
+
+    if (action !== "Archive" && !value) {
+
+        error.textContent =
+            "Enter a value for the selected action.";
+
+        error.classList.add("show");
+
+        return;
+
+    }
+
+    if (
+        action === "Update" &&
+        !["Enrolled", "Pending", "Dropped"].includes(value)
+    ) {
+
+        error.textContent =
+            "Status must be Enrolled, Pending, or Dropped.";
+
+        error.classList.add("show");
+
+        return;
+
+    }
+
+    checked.forEach(function(id) {
+
+        const student = findStudent(id);
+
+        if (!student) {
+            return;
+        }
+
+        if (action === "Promote") {
+
+            student.year = value;
+
+            student.history.push(
+                `Promoted to ${value}`
+            );
+
+        }
+
+        if (action === "Move") {
+
+            student.className = value;
+
+            student.history.push(
+                `Moved to class ${value}`
+            );
+
+        }
+
+        if (action === "Update") {
+
+            student.status = value;
+
+            student.history.push(
+                `Status changed to ${value}`
+            );
+
+        }
+
+        if (action === "AppendRequirement") {
+
+            student.requirements.push(value);
+
+            student.history.push(
+                `Requirement added: ${value}`
+            );
+
+        }
+
+        if (action === "AppendDocument") {
+
+            student.history.push(
+                `Document requirement added: ${value}`
+            );
+
+        }
+
+        if (action === "Archive") {
+
+            student.recordStatus = "Archived";
+
+            student.history.push(
+                "Record archived by batch action"
+            );
+
+        }
+
+        log(
+            `Batch ${action}`,
+            student.studentId
+        );
+
+    });
+
+    document.getElementById("batch-value").value = "";
+
+    document.getElementById("batch-action").value = "";
+
+    saveData();
+
+    renderTable();
+
+}
+
+function renderLog() {
+
+    const list =
+        document.getElementById("log-list");
+
+    list.innerHTML = "";
+
+    if (!logs.length) {
+
+        list.innerHTML =
+            "<li>No activity yet.</li>";
+
+        return;
+
+    }
+
+    logs.slice(0, 50).forEach(function(entry) {
+
+        const item =
+            document.createElement("li");
+
+        item.textContent =
+            `${entry.time} — ${entry.action} (${entry.id})`;
+
+        list.appendChild(item);
+
+    });
+
+}
+
+students.forEach(function(student) {
+
+    if (!student.requirements) {
+        student.requirements = [];
+    }
+
+    if (!student.requirementFiles) {
+        student.requirementFiles = [];
+    }
+
+    if (!student.documents) {
+        student.documents = [];
+    }
+
+    if (!student.history) {
+        student.history = [];
+    }
+
+    if (!student.className) {
+        student.className = "";
+    }
+
+});
+
+saveData();
+
+renderTable();
+
+renderLog();
+
+</script>
+
+</body>
+</html>
