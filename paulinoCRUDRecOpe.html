@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student File Management System</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 20px;
+    background: #000000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+  }
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #f3f3f3;
+    padding: 32px;
+  }
+  h1.title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 28px;
+  }
+  .panel {
+    background: #ffffff;
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  .panel h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 20px;
+  }
+  label {
+    display: block;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+  label:first-of-type { margin-top: 0; }
+  input[type="text"], select, input[type="date"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    background: #fff;
+    color: #1a1a1a;
+  }
+  input::placeholder { color: #a3a3a3; }
+  .hint {
+    font-size: 14px;
+    color: #444;
+    margin: 0 0 16px;
+  }
+  .hint a, .hint b { font-weight: 700; }
+  button {
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 18px;
+    cursor: pointer;
+  }
+  .btn-primary { background: #4caf50; color: #fff; margin-top: 20px; }
+  .btn-primary:hover { background: #439a46; }
+  .btn-secondary { background: #e5e5e5; color: #1a1a1a; }
+  .btn-secondary:hover { background: #d8d8d8; }
+  .btn-danger { background: #d9534f; color: #fff; }
+  .btn-danger:hover { background: #c9433f; }
+  .btn-warn { background: #f0ad4e; color: #fff; }
+  .btn-warn:hover { background: #ec9c32; }
+  .btn-small { padding: 6px 10px; font-size: 12px; margin-right: 6px; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #e5e5e5; font-size: 14px; }
+  th { font-weight: 700; color: #333; }
+  tr.archived td { color: #999; }
+  .status-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-active { background: #e3f3e4; color: #2f7d34; }
+  .status-archived { background: #efefef; color: #777; }
+
+  .batch-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .batch-bar select { width: auto; }
+  .batch-bar input[type="text"] { width: 160px; }
+
+  .empty-state { color: #777; font-size: 14px; padding: 12px 0; }
+
+  .log-list { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; }
+  .log-list li { font-size: 13px; padding: 6px 0; border-bottom: 1px solid #eee; color: #444; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: none; align-items: center; justify-content: center; z-index: 50;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 6px; padding: 24px 28px; width: 360px;
+  }
+  .modal h3 { margin: 0 0 12px; font-size: 17px; }
+  .modal p { font-size: 14px; color: #333; margin: 0 0 20px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+  .checkbox-cell { width: 30px; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <h1 class="title">Student File Management System</h1>
+
+  <div class="panel">
+    <h2>Add Student</h2>
+    <label>Student ID</label>
+    <input type="text" id="f-id" placeholder="Enter Student ID">
+
+    <label>Full Name</label>
+    <input type="text" id="f-name" placeholder="Enter Full Name">
+
+    <label>Reference Code</label>
+    <input type="text" id="f-ref" placeholder="Enter Reference Code">
+
+    <label>School Year</label>
+    <input type="text" id="f-year" placeholder="Example: 2026-2027">
+
+    <label>Enrollment Status</label>
+    <select id="f-status">
+      <option value="">Select Status</option>
+      <option value="Enrolled">Enrolled</option>
+      <option value="Pending">Pending</option>
+      <option value="Dropped">Dropped</option>
+    </select>
+
+    <label>File Category</label>
+    <input type="text" id="f-category" placeholder="Example: Academic">
+
+    <label>Student History</label>
+    <input type="text" id="f-history" placeholder="Example: Enrolled, Submitted Requirements">
+
+    <label>Digital Documents</label>
+    <input type="text" id="f-docs" placeholder="Example: Report Card, Birth Certificate">
+
+    <button class="btn-primary" onclick="addStudent()">Add Student</button>
+  </div>
+
+  <div class="panel">
+    <h2>Global Smart Search</h2>
+    <p class="hint">Search using Student ID, Full Name, or Reference Code.</p>
+    <input type="text" id="search-box" placeholder="Enter Student ID, Full Name, or Reference Code" oninput="renderTable()">
+  </div>
+
+  <div class="panel">
+    <h2>Student Records</h2>
+    <div class="batch-bar">
+      <select id="batch-action">
+        <option value="">Batch action...</option>
+        <option value="Promote">Promote</option>
+        <option value="Move">Move to class</option>
+        <option value="Update">Update status</option>
+        <option value="Archive">Archive selected</option>
+      </select>
+      <input type="text" id="batch-value" placeholder="New value (e.g. Grade 8-B)">
+      <button class="btn-secondary" onclick="runBatch()">Apply to selected</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th class="checkbox-cell"><input type="checkbox" id="select-all" onclick="toggleAll(this)"></th>
+          <th>Student ID</th>
+          <th>Full Name</th>
+          <th>Reference Code</th>
+          <th>School Year</th>
+          <th>Status</th>
+          <th>Record Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <div id="empty-msg" class="empty-state" style="display:none;">No student records match your search.</div>
+  </div>
+
+  <div class="panel">
+    <h2>Activity Log</h2>
+    <ul class="log-list" id="log-list"></ul>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h3 id="modal-title">Confirm action</h3>
+    <p id="modal-text">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-danger" id="modal-confirm-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let students = [];
+let nextInternalId = 1;
+
+function log(action, recordId) {
+  const time = new Date().toLocaleString();
+  const entry = { action, recordId, time };
+  logs.unshift(entry);
+  renderLog();
+}
+let logs = [];
+
+function addStudent() {
+  const id = document.getElementById('f-id').value.trim();
+  const name = document.getElementById('f-name').value.trim();
+  if (!id || !name) {
+    alert('Student ID and Full Name are required.');
+    return;
+  }
+  const student = {
+    internalId: nextInternalId++,
+    studentId: id,
+    name: name,
+    refCode: document.getElementById('f-ref').value.trim(),
+    year: document.getElementById('f-year').value.trim(),
+    status: document.getElementById('f-status').value,
+    category: document.getElementById('f-category').value.trim(),
+    history: document.getElementById('f-history').value.trim(),
+    docs: document.getElementById('f-docs').value.trim(),
+    recordStatus: 'Active'
+  };
+  students.push(student);
+  log('Created record', student.studentId);
+
+  ['f-id','f-name','f-ref','f-year','f-category','f-history','f-docs'].forEach(fid => document.getElementById(fid).value = '');
+  document.getElementById('f-status').value = '';
+
+  renderTable();
+}
+
+function toggleAll(checkbox) {
+  document.querySelectorAll('.row-check').forEach(c => c.checked = checkbox.checked);
+}
+
+function getFiltered() {
+  const q = document.getElementById('search-box').value.trim().toLowerCase();
+  if (!q) return students;
+  return students.filter(s =>
+    s.studentId.toLowerCase().includes(q) ||
+    s.name.toLowerCase().includes(q) ||
+    s.refCode.toLowerCase().includes(q)
+  );
+}
+
+function renderTable() {
+  const body = document.getElementById('table-body');
+  const emptyMsg = document.getElementById('empty-msg');
+  const list = getFiltered();
+  body.innerHTML = '';
+
+  if (list.length === 0) {
+    emptyMsg.style.display = 'block';
+  } else {
+    emptyMsg.style.display = 'none';
+  }
+
+  list.forEach(s => {
+    const tr = document.createElement('tr');
+    if (s.recordStatus === 'Archived') tr.classList.add('archived');
+
+    const tagClass = s.recordStatus === 'Archived' ? 'status-archived' : 'status-active';
+
+    tr.innerHTML = `
+      <td><input type="checkbox" class="row-check" data-id="${s.internalId}"></td>
+      <td>${escapeHtml(s.studentId)}</td>
+      <td>${escapeHtml(s.name)}</td>
+      <td>${escapeHtml(s.refCode)}</td>
+      <td>${escapeHtml(s.year)}</td>
+      <td>${escapeHtml(s.status)}</td>
+      <td><span class="status-tag ${tagClass}">${s.recordStatus}</span></td>
+      <td>
+        ${s.recordStatus === 'Active' ? `
+          <button class="btn-secondary btn-small" onclick="editStudent(${s.internalId})">Edit</button>
+          <button class="btn-warn btn-small" onclick="archiveStudent(${s.internalId})">Archive</button>
+          <button class="btn-danger btn-small" onclick="confirmHardDelete(${s.internalId})">Delete</button>
+        ` : `
+          <button class="btn-secondary btn-small" onclick="restoreStudent(${s.internalId})">Restore</button>
+          <button class="btn-danger btn-small" onclick="confirmHardDelete(${s.internalId})">Delete permanently</button>
+        `}
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function findStudent(internalId) {
+  return students.find(s => s.internalId === internalId);
+}
+
+function editStudent(internalId) {
+  const s = findStudent(internalId);
+  if (!s) return;
+  const newName = prompt('Update Full Name:', s.name);
+  if (newName === null) return;
+  const newStatus = prompt('Update Enrollment Status (Enrolled / Pending / Dropped):', s.status);
+  if (newStatus === null) return;
+  s.name = newName.trim() || s.name;
+  s.status = newStatus.trim() || s.status;
+  log('Edited record', s.studentId);
+  renderTable();
+}
+
+function archiveStudent(internalId) {
+  const s = findStudent(internalId);
+  if (!s) return;
+  s.recordStatus = 'Archived';
+  log('Archived record', s.studentId);
+  renderTable();
+}
+
+function restoreStudent(internalId) {
+  const s = findStudent(internalId);
+  if (!s) return;
+  s.recordStatus = 'Active';
+  log('Restored record', s.studentId);
+  renderTable();
+}
+
+let pendingDeleteId = null;
+function confirmHardDelete(internalId) {
+  pendingDeleteId = internalId;
+  document.getElementById('modal-title').textContent = 'Delete record permanently';
+  document.getElementById('modal-text').textContent = 'This removes the record completely and cannot be undone. Continue?';
+  document.getElementById('confirm-modal').classList.add('open');
+  document.getElementById('modal-confirm-btn').onclick = executeHardDelete;
+}
+
+function executeHardDelete() {
+  const s = findStudent(pendingDeleteId);
+  if (s) {
+    students = students.filter(st => st.internalId !== pendingDeleteId);
+    log('Permanently deleted record', s.studentId);
+  }
+  closeModal();
+  renderTable();
+}
+
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  pendingDeleteId = null;
+}
+
+function runBatch() {
+  const action = document.getElementById('batch-action').value;
+  const value = document.getElementById('batch-value').value.trim();
+  const checked = Array.from(document.querySelectorAll('.row-check:checked')).map(c => parseInt(c.dataset.id));
+
+  if (!action) { alert('Choose a batch action first.'); return; }
+  if (checked.length === 0) { alert('Select at least one record.'); return; }
+
+  checked.forEach(id => {
+    const s = findStudent(id);
+    if (!s) return;
+    if (action === 'Promote') {
+      s.year = value || s.year;
+      s.history = (s.history ? s.history + ', ' : '') + 'Promoted';
+    } else if (action === 'Move') {
+      s.category = value || s.category;
+    } else if (action === 'Update') {
+      s.status = value || s.status;
+    } else if (action === 'Archive') {
+      s.recordStatus = 'Archived';
+    }
+    log(`Batch ${action}`, s.studentId);
+  });
+
+  document.getElementById('batch-value').value = '';
+  renderTable();
+}
+
+function renderLog() {
+  const list = document.getElementById('log-list');
+  list.innerHTML = '';
+  if (logs.length === 0) {
+    list.innerHTML = '<li>No activity yet.</li>';
+    return;
+  }
+  logs.slice(0, 30).forEach(entry => {
+    const li = document.createElement('li');
+    li.textContent = `${entry.time} — ${entry.action} (${entry.recordId})`;
+    list.appendChild(li);
+  });
+}
+
+renderTable();
+renderLog();
+</script>
+
+</body>
+</html>
